@@ -104,6 +104,22 @@ window = {
 
 					"text" : "",
 				},
+
+				## Datetime
+				{
+					"name" : "Datetime",
+					"type" : "text",
+
+					"text_horizontal_align" : "center",
+
+					"outline" : 1,
+
+					"x" : 70,
+					"y" : 160,
+
+					"text" : "",
+				},
+
 				## PositionInfo
 				{
 					"name" : "PositionInfo",

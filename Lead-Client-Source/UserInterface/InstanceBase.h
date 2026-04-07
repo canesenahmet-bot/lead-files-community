@@ -305,6 +305,12 @@ class CInstanceBase
 			DAMAGE_BLOCK	= (1<<3),
 			DAMAGE_PENETRATE= (1<<4),
 			DAMAGE_CRITICAL = (1<<5),
+#ifdef ENABLE_EFFECT_DAMAGE_FIRE
+			DAMAGE_FIRE = (1 << 6),
+#endif
+#ifdef ENABLE_EFFECT_DAMAGE_BLEEDING
+			DAMAGE_BLEEDING = (1 << 7),
+#endif
 			// reflection
 		};
 
@@ -371,6 +377,12 @@ class CInstanceBase
 			EFFECT_HAPPINESS_RING_EQUIP,				// Effect that activates the moment you wear the Ring of Happiness
 			EFFECT_LOVE_PENDANT_EQUIP,				// Effect that activates the moment you wear the Ring of Happiness
 			EFFECT_TEMP,
+#ifdef ENABLE_EFFECT_DAMAGE_FIRE
+			EFFECT_DAMAGE_FIRE,
+#endif
+#ifdef ENABLE_EFFECT_DAMAGE_BLEEDING
+			EFFECT_DAMAGE_BLEEDING,
+#endif
 			EFFECT_NUM,
 		};
 

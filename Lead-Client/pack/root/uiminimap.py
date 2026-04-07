@@ -10,6 +10,7 @@ import colorInfo
 import constInfo
 import background
 import chr
+from time import strftime
 
 class MapTextToolTip(ui.Window):
 	def __init__(self):			
@@ -263,6 +264,7 @@ class MiniMap(ui.ScriptWindow):
 	def __Initialize(self):
 		self.positionInfo = 0
 		self.observerCount = 0
+		self.dataTime = 0
 
 		self.OpenWindow = 0
 		self.CloseWindow = 0
@@ -340,6 +342,7 @@ class MiniMap(ui.ScriptWindow):
 			self.CloseWindow = self.GetChild("CloseWindow")
 			self.MiniMapShowButton = self.GetChild("MiniMapShowButton")
 			self.positionInfo = self.GetChild("PositionInfo")
+			self.dataTime = self.GetChild("Datetime")
 			self.observerCount = self.GetChild("ObserverCount")
 			self.serverInfo = self.GetChild("ServerInfo")
 		except:
@@ -398,6 +401,7 @@ class MiniMap(ui.ScriptWindow):
 		miniMap.Update(x, y)
 
 		self.positionInfo.SetText("(%.0f, %.0f)" % (x/100, y/100))
+		self.dataTime.SetText(strftime("[%H:%M:%S - %d/%m/%Y]"))
 
 		if self.tooltipInfo:
 			if True == self.MiniMapWindow.IsIn():

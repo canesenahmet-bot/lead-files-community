@@ -140,6 +140,94 @@ void CInstanceBase::ProcessDamage()
 
 	std::string strDamageType;
 	DWORD rdwCRCEft = 0;
+
+
+#ifdef ENABLE_EFFECT_DAMAGE_POISON
+	if ((flag & DAMAGE_POISON))
+	{
+		strDamageType = "poison_";
+		rdwCRCEft = EFFECT_DAMAGE_POISON;
+	}
+#endif
+#ifdef ENABLE_EFFECT_DAMAGE_FIRE	
+	else if ((flag & DAMAGE_FIRE))
+	{
+		strDamageType = "burn_";
+		rdwCRCEft = EFFECT_DAMAGE_FIRE;
+	}
+#endif	
+#ifdef ENABLE_EFFECT_DAMAGE_BLEEDING	
+	else if ((flag & DAMAGE_BLEEDING))
+	{
+		strDamageType = "bleed_";
+		rdwCRCEft = EFFECT_DAMAGE_BLEEDING;
+	}
+#endif	
+#if defined(ENABLE_EFFECT_DAMAGE_POISON) || defined(ENABLE_EFFECT_DAMAGE_BLEEDING) || defined(ENABLE_EFFECT_DAMAGE_FIRE)
+	else
+	{
+#endif
+		if (bSelf)
+		{
+			if (m_bDamageEffectType == 0)
+				rdwCRCEft = EFFECT_DAMAGE_SELFDAMAGE;
+			else
+				rdwCRCEft = EFFECT_DAMAGE_SELFDAMAGE2;
+
+#ifdef ENABLE_EFFECT_DAMAGE_CRITICAL_AND_PENETRATE	
+			if (IS_SET(flag, DAMAGE_CRITICAL) && IS_SET(flag, DAMAGE_PENETRATE))
+				strDamageType = "damage_crit_pen_";
+#endif
+#ifdef ENABLE_EFFECT_DAMAGE_CRITICAL
+			else if (IS_SET(flag, DAMAGE_CRITICAL))
+				strDamageType = "damage_crit_";
+#endif
+#ifdef ENABLE_EFFECT_DAMAGE_PENETRATE
+			else if (IS_SET(flag, DAMAGE_PENETRATE))
+				strDamageType = "damage_pen_";
+#endif
+#if defined(ENABLE_EFFECT_DAMAGE_CRITICAL_AND_PENETRATE) || defined(ENABLE_EFFECT_DAMAGE_CRITICAL) || defined(ENABLE_EFFECT_DAMAGE_PENETRATE)
+			else
+				strDamageType = "damage_";
+#else
+			strDamageType = "damage_";
+#endif	
+			m_bDamageEffectType = !m_bDamageEffectType;
+		}
+		else if (bTarget == false)
+		{
+			strDamageType = "nontarget_";
+			rdwCRCEft = EFFECT_DAMAGE_NOT_TARGET;
+			return;
+		}
+		else
+		{
+			rdwCRCEft = EFFECT_DAMAGE_TARGET;
+#ifdef ENABLE_EFFECT_TARGET_CRITICAL_AND_PENETRATE
+			if (IS_SET(flag, DAMAGE_CRITICAL) && IS_SET(flag, DAMAGE_PENETRATE))
+				strDamageType = "target_crit_pen_";
+#endif			
+#ifdef ENABLE_EFFECT_TARGET_CRITICAL			
+			else if (IS_SET(flag, DAMAGE_CRITICAL))
+				strDamageType = "target_crit_";
+#endif
+#ifdef ENABLE_EFFECT_TARGET_PENETRATE			
+			else if (IS_SET(flag, DAMAGE_PENETRATE))
+				strDamageType = "target_pen_";
+#endif
+#if defined(ENABLE_EFFECT_TARGET_CRITICAL_AND_PENETRATE) || defined(ENABLE_EFFECT_TARGET_CRITICAL) || defined(ENABLE_EFFECT_TARGET_PENETRATE)			
+			else
+				strDamageType = "target_";
+#else
+			strDamageType = "target_";
+#endif	
+		}
+#if defined(ENABLE_EFFECT_DAMAGE_POISON) || defined(ENABLE_EFFECT_DAMAGE_BLEEDING) || defined(ENABLE_EFFECT_DAMAGE_FIRE)
+	}
+#endif
+
+	DWORD index = 0;
+
 	/*
 	if ( (flag & DAMAGE_POISON) )
 	{
@@ -171,7 +259,6 @@ void CInstanceBase::ProcessDamage()
 		}
 	}
 	
-	DWORD index = 0;
 	DWORD num = 0;
 	std::vector<std::string> textures;
 	while(damage>0)
