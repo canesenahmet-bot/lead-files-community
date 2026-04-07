@@ -51,7 +51,108 @@ IsQBHide = 0
 class Interface(object):
 	CHARACTER_STATUS_TAB = 1
 	CHARACTER_SKILL_TAB = 2
-	
+
+	class NewGoldChat(ui.Window):
+		def __init__(self, parent = None, x = 0, y = 0):
+			ui.Window.__init__(self)
+			self.texts = []
+			self.parent = parent
+			self.SpaceBet = 14
+			self.maxY = 0
+			self.x = x
+			self.y = y
+			self.ColorValue = 0xFFFFFFFF
+			
+			self.show = self.Button('Show Yang', x, y+3, self.showYang, 'sanyed_yang/btn_expand_normal.tga', 'sanyed_yang/btn_expand_over.tga', 'sanyed_yang/btn_expand_down.tga')
+			self.hide = self.Button('Hide Yang', x, y+3, self.hideYang, 'sanyed_yang/btn_minimize_normal.tga', 'sanyed_yang/btn_minimize_over.tga', 'sanyed_yang/btn_minimize_down.tga')
+			self.show.Hide()
+			self.Show()
+
+		def OnUpdate(self):
+			current = app.GetTime()
+		
+			new_list = []
+			y_offset = 0
+		
+			for entry in self.texts:
+				if current - entry["time"] < 2.5:
+					txt = entry["text"]
+					txt.SetPosition(self.x, self.y - y_offset)
+					new_list.append(entry)
+					y_offset += self.SpaceBet
+				else:
+					entry["text"].Hide()
+		
+			self.texts = new_list
+
+		def Button(self, tooltipText, x, y, func, UpVisual, OverVisual, DownVisual):
+			button = ui.Button()
+			if self.parent != None:
+				button.SetParent(self.parent)
+			button.SetPosition(x, y)
+			button.SetUpVisual(UpVisual)
+			button.SetOverVisual(OverVisual)
+			button.SetDownVisual(DownVisual)
+			button.SetToolTipText(tooltipText)
+			button.Show()
+			button.SetEvent(func)
+			return button
+
+		def showYang(self):
+			for i in self.texts:
+				i["text"].Show()
+			self.hide.Show()
+			self.show.Hide()
+			self.Show()
+
+		def hideYang(self):
+			for i in self.texts:
+				i["text"].Hide()
+			self.hide.Hide()
+			self.show.Show()
+			self.Hide()
+			
+		def GetMaxY(self):
+			return self.maxY
+
+		def AddGoldValue(self, text):
+			txt = ui.TextLine("Tahoma:14")
+		
+			if self.parent != None:
+				txt.SetParent(self.parent)
+		
+			txt.SetPosition(self.x, self.y)
+			txt.SetPackedFontColor(self.ColorValue)
+			txt.SetHorizontalAlignLeft()
+			txt.SetOutline(TRUE)
+			txt.SetText(text)
+		
+			# 👇 HIER FIX
+			if self.hide.IsShow():
+				txt.Show()
+			else:
+				txt.Hide()
+		
+			self.texts.append({
+				"text": txt,
+				"time": app.GetTime()
+			})
+
+		def ClearAll(self):
+			self.Hide()
+			self.texts = []
+			self.show.Hide()
+			self.show = None
+			self.hide.Hide()
+			self.hide = None
+
+		def OnRender(self):
+			if len(self.texts) > 0 and self.hide.IsShow():
+				x, y = self.hide.GetGlobalPosition()
+				w, h = self.texts[0].GetTextSize()
+				grp.SetColor(grp.GenerateColor(0.0, 0.0, 0.0, 0.5))
+				grp.RenderBar(x, y+h-6, 108, h*len(self.texts)+4)
+
 	def __init__(self):
 		systemSetting.SetInterfaceHandler(self)
 		self.windowOpenPosition = 0
@@ -72,6 +173,7 @@ class Interface(object):
 		self.wndDragonSoul = None
 		self.wndDragonSoulRefine = None
 		self.wndChat = None
+		self.yangText = None
 		self.wndMessenger = None
 		self.wndMiniMap = None
 		self.wndGuild = None
@@ -123,6 +225,15 @@ class Interface(object):
 		self.wndChat.BindInterface(self)
 		self.wndChat.SetSendWhisperEvent(ui.__mem_func__(self.OpenWhisperDialogWithoutTarget))
 		self.wndChat.SetOpenChatLogEvent(ui.__mem_func__(self.ToggleChatLogWindow))
+
+#add:
+		if self.yangText:
+			self.yangText.Hide()
+		yangText = self.NewGoldChat(None, wndMgr.GetScreenWidth()/2 - wndChat.CHAT_WINDOW_WIDTH/2 + 600, wndMgr.GetScreenHeight() - wndChat.EDIT_LINE_HEIGHT - 37 + 9)
+		self.yangText = yangText
+##and after this function add:
+	def OnPickMoneyNew(self, money):
+		self.yangText.AddGoldValue("+%s"%(localeInfo.NumberToMoneyString(money)))
 
 	def __MakeTaskBar(self):
 		wndTaskBar = uiTaskBar.TaskBar()
@@ -367,6 +478,9 @@ class Interface(object):
 		if self.wndChat:
 			self.wndChat.Destroy()
 
+		if self.yangText:
+			self.yangText.ClearAll()
+
 		if self.wndTaskBar:
 			self.wndTaskBar.Destroy()
 		
@@ -482,6 +596,7 @@ class Interface(object):
 		del self.wndMessenger
 		del self.wndUICurtain
 		del self.wndChat
+		del self.yangText
 		del self.wndTaskBar
 		if self.wndExpandedTaskBar:
 			del self.wndExpandedTaskBar
@@ -836,6 +951,7 @@ class Interface(object):
 			self.wndDragonSoul.Show()
 			self.wndDragonSoulRefine.Show()
 		self.wndChat.Show()
+		self.yangText.Show()
 		self.wndMiniMap.Show()
 		if self.wndEnergyBar:
 			self.wndEnergyBar.Show()
@@ -862,6 +978,9 @@ class Interface(object):
 
 		if self.wndChat:
 			self.wndChat.Hide()
+
+		if self.yangText:
+			self.yangText.Hide()
 
 		if self.wndMiniMap:
 			self.wndMiniMap.Hide()
@@ -1171,6 +1290,7 @@ class Interface(object):
 						self.wndGuild,\
 						self.wndMessenger,\
 						self.wndChat,\
+						self.yangText,\
 						self.wndParty,\
 						self.wndGameButton,
 

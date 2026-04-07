@@ -758,10 +758,13 @@ class CandidateListBox(ListBoxEx):
 
 
 class TextLine(Window):
-	def __init__(self):
+	def __init__(self, font = None):
 		Window.__init__(self)
 		self.max = 0
-		self.SetFontName(localeInfo.UI_DEF_FONT)
+		if font == None:
+			self.SetFontName(localeInfo.UI_DEF_FONT)
+		else:
+			self.SetFontName(font)
 
 	def __del__(self):
 		Window.__del__(self)

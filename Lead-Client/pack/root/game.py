@@ -877,7 +877,7 @@ class GameWindow(ui.ScriptWindow):
 		self.interface.RecvWhisper(name)
 
 	def OnPickMoney(self, money):
-		chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.GAME_PICK_MONEY % (money))
+		self.interface.OnPickMoneyNew(money)
 
 	def OnShopError(self, type):
 		try:

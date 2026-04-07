@@ -325,67 +325,39 @@ EVENTFUNC(timed_event)
 
 ACMD(do_cmd)
 {
-	/* RECALL_DELAY
-	   if (ch->m_pkRecallEvent != NULL)
-	   {
-	   ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Your logout has been cancelled."));
-	   event_cancel(&ch->m_pkRecallEvent);
-	   return;
-	   }
-	// END_OF_RECALL_DELAY */
+	LPDESC d = ch->GetDesc();
 
+	// Falls noch ein Event läuft -> stoppen
 	if (ch->m_pkTimedEvent)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Your logout has been cancelled."));
 		event_cancel(&ch->m_pkTimedEvent);
-		return;
+		ch->m_pkTimedEvent = NULL;
 	}
 
 	switch (subcmd)
 	{
-		case SCMD_LOGOUT:
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Back to login window. Please wait."));
-			break;
-
-		case SCMD_QUIT:
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You have been disconnected from the server. Please wait."));
-			break;
-
-		case SCMD_PHASE_SELECT:
-			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You are changing character. Please wait."));
-			break;
+	case SCMD_LOGOUT:
+	{
+		if (d)
+			d->SetPhase(PHASE_CLOSE);
+		break;
 	}
 
-	int nExitLimitTime = 10;
-
-	if (ch->IsHack(false, true, nExitLimitTime) &&
-	   	(!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG))
+	case SCMD_QUIT:
 	{
-		return;
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "quit");
+		break;
 	}
-	
-	switch (subcmd)
+
+	case SCMD_PHASE_SELECT:
 	{
-		case SCMD_LOGOUT:
-		case SCMD_QUIT:
-		case SCMD_PHASE_SELECT:
-			{
-				TimedEventInfo* info = AllocEventInfo<TimedEventInfo>();
+		if (d)
+			d->SetPhase(PHASE_SELECT);
+		break;
+	}
 
-				{
-					if (ch->IsPosition(POS_FIGHTING))
-						info->left_second = 10;
-					else
-						info->left_second = 3;
-				}
-
-				info->ch		= ch;
-				info->subcmd		= subcmd;
-				strlcpy(info->szReason, argument, sizeof(info->szReason));
-
-				ch->m_pkTimedEvent	= event_create(timed_event, info, 1);
-			}
-			break;
+	default:
+		break;
 	}
 }
 

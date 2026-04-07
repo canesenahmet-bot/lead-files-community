@@ -40,10 +40,12 @@ bool battle_distance_valid(LPCHARACTER ch, LPCHARACTER victim)
 
 bool timed_event_cancel(LPCHARACTER ch)
 {
-	if (ch->m_pkTimedEvent)
 	{
-		event_cancel(&ch->m_pkTimedEvent);
-		return true;
+		// Logout NICHT mehr abbrechen
+		// event_cancel(&ch->m_pkTimedEvent);
+		// event_cancel(&ch->m_pkRecallEvent);
+
+		return false;
 	}
 
 	/* RECALL_DELAY
@@ -146,7 +148,7 @@ int battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim)
 		}
 	}
 
-	if (timed_event_cancel(ch))
+	// if (timed_event_cancel(ch))
 		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Action cancelled. You have entered a battle."));
 
 	if (timed_event_cancel(victim))
