@@ -5,6 +5,6 @@ P2P_PORT: 14022
 DB_ADDR: 127.0.0.1
 DB_PORT: 15000
 MAP_ALLOW: 41 44 45 46 109 62 64 65 66 71 104 301 351
-PLAYER_SQL: 127.0.0.1 metin2 password player
-COMMON_SQL: 127.0.0.1 metin2 password common
-LOG_SQL: 127.0.0.1 metin2 password log
+PLAYER_SQL: 127.0.0.1 root amocan player
+COMMON_SQL: 127.0.0.1 root amocan common
+LOG_SQL: 127.0.0.1 root amocan log

@@ -4,7 +4,7 @@ PORT: 11000
 P2P_PORT: 12000
 DB_ADDR: 127.0.0.1
 DB_PORT: 15000
-PLAYER_SQL: 127.0.0.1 metin2 password account
-COMMON_SQL: 127.0.0.1 metin2 password common
-LOG_SQL: 127.0.0.1 metin2 password log
+PLAYER_SQL: 127.0.0.1 root amocan account
+COMMON_SQL: 127.0.0.1 root amocan common
+LOG_SQL: 127.0.0.1 root amocan log
 AUTH_SERVER: master
